@@ -2,9 +2,14 @@
 session_start();
 
 require_once './connection.php' ;
+
+if(isset($_POST['group_contact'])) {
+	$username = $_POST["group_contact"];	
+} else {
 	$username = $_SESSION["contact_no"];
+}	
 	$sql = "SELECT * FROM expense_table WHERE contact_no='$username' ORDER BY date_ex";
-	$result = $conn->query($sql);	 
+	$result = $conn->query($sql);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -34,9 +39,10 @@ require_once './connection.php' ;
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
 </head>
 <body style="background: linear-gradient(to top right, #eff0f2 0%, #ffffff 100%)">
-<form action="" name="myForm" id="myForm1">
- <div class="row"><nav class="navbar navbar-expand-md bg-dark navbar-dark fixed-top"><div class="col-md-11">
+ <div class="row"><nav class="navbar navbar-expand-md bg-dark navbar-dark fixed-top"><div class="col-md-9">
   <a class="navbar-brand" href="youraccount.php">Personal Expense Manager</a></div>
+ <div class="col-md-2">  <a href="group.php"><input type="button" value="Group Create/Join" class="btn btn-dark" style="border:2px solid grey;">	</a></div>
+
 <div class="col-md-1">  <a href="logout.php?logout"><input type="button" value="Logout" class="btn btn-dark" style="border:2px solid grey;">	</a></div>
 </nav></div>
 
@@ -49,10 +55,11 @@ require_once './connection.php' ;
 		require_once './connection.php';
 		$uname = $_SESSION["name"];
 		echo $uname;
-?>
+	?>
 </b></h4>
 	 	<hr style="background-color: white">
  	</div>
+		
 
 </div>
 
@@ -89,54 +96,58 @@ require_once './connection.php' ;
 		?>	
  	</div>
  		<?php 
-	 }
+			}
 			}
 		?>
   </div>
    
   </div>
  <div class="row">
-	 <div class="col-md-10">
+	<div class="col-md-10">
 
-	 </div>
+	</div>
  <div class="col-md-2">
  	<a href="selectexpense.php"><input type="button" value="Add Expenses" class="btn btn-secondary"></a>
  </div>
 </div>
- <div class="row">
- <div class="col-md-6">
-            <div class="form-group">
-                <div class="input-group date" id="datetimepicker2">
-                    <input type="date" name="date2" class="form-control" />
-                    <span class="input-group-addon">
-                    <span class="glyphicon glyphicon-calendar"></span>
-                    </span>
-                </div>
-            </div>
- </div>
- <div class="col-md-6">
- 	<input class="btn btn-primary" type="submit" name="insert" value="ok">
- </div>
-</div>
- <div class="row">
- <div class="col-md-12">
-	<?php
-if(isset($_POST['insert'])){
-	
-	$date = $_POST['date2'];
-	echo $date;
-	exit();
-	$username = $_SESSION["contact_no"];
-	$date = date("d-M-Y");
 
-	$sql = "INSERT INTO expense_table (e_type, total, Contact_No, date_ex) VALUES('food', $total, $username, '$date')";
-	$conn->query($sql);
-	
-	header("Location: youraccount.php");
-} 
-?>
- </div>
+<div class="row">
+	    <div class="col-md-5">
+		<div class="card">
+			<div class="card-header">
+				<span class="card-title">See Your Group Details</span>
+			</div>
+			
+			<div class="card-body">
+			 <form method="POST">
+				
+				<select name="group_contact">
+					<?PHP
+						$contact = $_SESSION["contact_no"];
+						$query = "SELECT group_create.group_code, group_create.Contact_No from group_member INNER JOIN group_create ON group_create.gp_id = group_member.gp_id WHERE group_member.contact_no = '$contact';";
+						
+						$result = $conn->query($query);
+				
+						if($result->num_rows > 0)
+						{
+							while($row = mysqli_fetch_array($result)) {					
+								$cnt = $row['Contact_No'];
+								$groupCode = $row['group_code'];
+								
+								echo "<option value='$cnt'>$groupCode</option>";
+							}
+						}
+					?>
+				</select>		
+				<input type="submit" class="btn btn-primary" value="Show" name="show_details">
+			</form>
+			</div>			
+		</div>
+    </div>
 </div>
+
+ </div>
+ 
 </div>
 	<div class="container-fluid">
 		<div class="container">
@@ -168,13 +179,5 @@ if(isset($_POST['insert'])){
 	</div>
 
 	</div>
-</form>
-        <script type="text/javascript">
-            $(function () {
-                $('#datetimepicker2').datetimepicker({
-                    locale: 'ru'
-                });
-            });
-        </script>
 </body>
 </html>

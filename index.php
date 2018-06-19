@@ -7,7 +7,9 @@ require_once './connection.php' ;
 if(isset($_POST['create'])){
 	$sql="INSERT INTO create_login(Name, Contact_No, Password) VALUES('" . $_POST["Name"] . "','" . $_POST["Phone"] . "','" . $_POST["password"] . "')";
 	$result = mysqli_query($conn, $sql);
-	header("Location: youraccount.php");
+	//$_SESSION["name"] = $_POST["Name"];
+	//header("Location: youraccount.php");
+	$message = $result ? "Account created! Please Login" : "Unable to create ";
 	
 } else if(isset($_POST["login"]))
 {	
@@ -15,7 +17,7 @@ if(isset($_POST['create'])){
 	$password=$_POST['lpassword'];
 	
 	$sql = "SELECT * FROM create_login WHERE contact_no='$username' and password = '$password'";
-	$result = $conn->query($sql);		
+	$result = $conn->query($sql);	
 
 	if($result->num_rows > 0)
 	{	
@@ -90,6 +92,13 @@ if(isset($_POST['create'])){
 				<input type="password" name="password" placeholder="Enter your password no" class="form-control" required>
 			</div>
 			(Note: Contact No will be use as Username)<br>
+			<?PHP
+						if(isset($message)) {
+							echo '<br>';
+							echo $message;	
+							echo '<br>';	
+						}
+					?>
 			<input type="submit" name="create" value="Create" class="btn btn-secondary" />
 			<input type="reset" value="Reset form" class="btn btn-secondary">
 		</form>
